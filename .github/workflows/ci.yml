@@ -1,0 +1,124 @@
+name: geneAi_bdd_Playwright CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create env file
+        run: |
+          cat <<EOF > env/.env
+          BROWSER=chromium
+          HEADLESS=true
+          BROWSER_WIDTH=1920
+          BROWSER_HEIGHT=1080
+          PARALLEL=1
+          RETRY=0
+          LOG_LEVEL=info
+          NavigationTimeOut=60000
+          CommandTimeout=30000
+          CucumberTimeout=80000
+          dev_url=${{ secrets.GENEAI_DEV_URL }}
+          GENE_AI_USERNAME=${{ secrets.GENE_AI_USERNAME }}
+          GENE_AI_PASSWORD=${{ secrets.GENE_AI_PASSWORD }}
+          EOF
+
+      - name: Run Cucumber tests (with Allure generation)
+        run: npm run test:ci
+        env:
+          NODE_ENV: test
+
+      - name: Upload cucumber json report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report-json
+          path: test-results/cucumber-report.json
+          if-no-files-found: warn
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-results/screenshots
+          if-no-files-found: ignore
+
+      - name: Upload videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos
+          path: test-results/videos
+          if-no-files-found: ignore
+
+      - name: Upload Allure raw results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+          if-no-files-found: ignore
+
+      - name: Upload Allure report (static site)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allureReport
+          if-no-files-found: ignore
+
+      - name: Display disk usage (debug)
+        if: always()
+        run: du -h test-results || true
+
+  deploy-allure:
+    name: Deploy Allure Report to GitHub Pages
+    needs: test
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'failure')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Allure report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-report
+          path: ./allureReport
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./allureReport
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

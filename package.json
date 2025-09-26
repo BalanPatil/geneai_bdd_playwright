@@ -1,0 +1,43 @@
+{
+  "name": "geneai_bdd_playwright",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bdd": "node -r ts-node/register ./src/index.ts",
+    "test:tags": "npm run bdd --",
+    "test:smoke": "npm run bdd -- smoke",
+    "test:regression": "npm run bdd -- regression",
+    "test:login": "npm run bdd -- login",
+    "test:ci": "node -r ts-node/register ./src/index.ts",
+    "allure:generate": "npx allure generate allure-results -o allureReport --clean",
+    "allure:open": "npx allure open allureReport"
+  },
+ 
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "format": [
+    "progress",
+    "json:reports/cucumber-report.json"
+  ],
+  "devDependencies": {
+    "@colors/colors": "^1.6.0",
+    "@cucumber/cucumber": "^12.2.0",
+    "@cucumber/cucumber-expressions": "^18.0.1",
+    "@cucumber/pretty-formatter": "^2.3.0",
+    "@playwright/test": "^1.55.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.5.2",
+  "cucumber-html-reporter": "^7.2.0",
+  "allure-commandline": "^2.34.1",
+  "allure-cucumberjs": "^3.4.1",
+  "allure-js-commons": "^3.4.1",
+    "dotenv": "^17.2.2",
+    "fs-extra": "^11.3.2",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "winston": "^3.17.0"
+  }
+}

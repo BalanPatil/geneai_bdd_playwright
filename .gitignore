@@ -1,0 +1,79 @@
+#############################
+# Node / Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# TypeScript build artifacts
+dist/
+out/
+*.tsbuildinfo
+
+# Playwright artifacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Allure artifacts (generated)
+allure-results/
+allureReport/
+allure-archive/
+
+# Reports
+reports/
+
+# Logs & media
+logs/
+src/Logs/
+*.log
+*.png
+*.jpg
+*.jpeg
+*.webm
+*.mp4
+screenshots/
+videos/
+
+# Environment / secrets
+.env
+.env.*
+!*.example
+env/.env
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Misc
+coverage/
+*.swp
+*.tgz
+!.github/
+
+#############################
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Environment & secrets
+env/.env
+.env
+
+# Reports & artifacts
+reports/
+report/
+allure-results/
+allure-report/
+coverage/
+nyc_output/
+videos/
+screenshots/
+*.log
