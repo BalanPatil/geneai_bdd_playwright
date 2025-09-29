@@ -38,10 +38,11 @@ screenshots/
 videos/
 
 # Environment / secrets
+# Keep real environment files out of git. Commit only examples with placeholders.
 .env
 .env.*
 !*.example
-env/.env
+env/.env   # DO NOT COMMIT REAL SECRETS. Use env/.env.example instead.
 
 # IDE / OS
 .DS_Store
@@ -55,25 +56,4 @@ coverage/
 *.tgz
 !.github/
 
-#############################
-# Playwright
-node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-
-# Environment & secrets
-env/.env
-.env
-
-# Reports & artifacts
-reports/
-report/
-allure-results/
-allure-report/
-coverage/
-nyc_output/
-videos/
-screenshots/
-*.log
+# (Removed duplicate ignore section below that was repeating patterns)

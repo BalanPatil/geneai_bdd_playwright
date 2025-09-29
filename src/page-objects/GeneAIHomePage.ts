@@ -10,9 +10,9 @@ export class GeneAIHomePage extends BasePage {
         myDocsLink: Locator;
     };
 
-   /* constructor() {
+    constructor() {
         super();
-    } */
+    }
 
     private initializeLocators(): void {
         this.locators = {
@@ -24,42 +24,36 @@ export class GeneAIHomePage extends BasePage {
     }
 
     public async clickOnNewChat(): Promise<void> {
-        this.initializeLocators();
         await this.locators.newChatLink.click();
         await this.page.waitForLoadState("networkidle");
         logger.info("Clicked on New Chat");
     }
 
     public async clickOnAgents(): Promise<void> {
-        this.initializeLocators();
         await this.locators.agentsLink.click();
         await this.page.waitForLoadState("networkidle");
         logger.info("Clicked on Agents Link");
     }
 
     public async verifyNewChatLink(): Promise<void> {
-        this.initializeLocators();
         await this.locators.newChatLink.waitFor({ state: "visible" });
         await this.page.waitForLoadState("networkidle");
         logger.info("New Chat Link is visible");
     }
 
     public async verifyAgentLink(): Promise<void> {
-        this.initializeLocators();
         await this.locators.agentsLink.waitFor({ state: "visible" });
         await this.page.waitForLoadState("networkidle");
         logger.info("Agents Link is visible");
     }
 
     public async verifyAskOurDocsLink(): Promise<void> {
-        this.initializeLocators();
         await this.locators.askDocsLink.waitFor({ state: "visible", timeout: 10000 });
         await this.page.waitForLoadState("networkidle");
         logger.info("Ask Our Docs Link is visible on Gene AI Home Page");
     }
 
     public async verifyMyDocsLink(): Promise<void> {
-        this.initializeLocators();
         await this.locators.myDocsLink.waitFor({ state: "visible", timeout: 10000 });
         await this.page.waitForLoadState("networkidle");
         logger.info("Verified My Docs link on Home Page");

@@ -1,5 +1,5 @@
 
-@smoke
+@smoke123
 Feature: Gene AI Home Page features validation
 
     Background: Pre Condition

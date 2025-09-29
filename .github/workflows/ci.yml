@@ -6,6 +6,27 @@ on:
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Cucumber tag expression (e.g. @smoke or @regression). Leave blank for default (not @ignore).'
+        required: false
+        default: ''
+      parallel:
+        description: 'Parallel workers'
+        required: false
+        default: '1'
+      retry:
+        description: 'Retry count for failing scenarios'
+        required: false
+        default: '0'
+      browser:
+        description: 'Browser (chromium | firefox | webkit)'
+        required: false
+        default: 'chromium'
+      headless:
+        description: 'Run headless (true|false)'
+        required: false
+        default: 'true'
 
 permissions:
   contents: read
@@ -14,8 +35,9 @@ permissions:
 
 jobs:
   test:
+    # Change to self-hosted if you have a registered runner, e.g.: runs-on: [self-hosted, linux, x64]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -32,15 +54,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Playwright browsers (chromium only by default)
+        run: |
+          npx playwright install --with-deps ${{ github.event.inputs.browser || 'chromium' }}
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/pw-browsers
+
       - name: Create env file
         run: |
+          mkdir -p env
           cat <<EOF > env/.env
-          BROWSER=chromium
-          HEADLESS=true
+          BROWSER=${{ github.event.inputs.browser || 'chromium' }}
+          HEADLESS=${{ github.event.inputs.headless || 'true' }}
           BROWSER_WIDTH=1920
           BROWSER_HEIGHT=1080
-          PARALLEL=1
-          RETRY=0
+          PARALLEL=${{ github.event.inputs.parallel || '1' }}
+          RETRY=${{ github.event.inputs.retry || '0' }}
           LOG_LEVEL=info
           NavigationTimeOut=60000
           CommandTimeout=30000
@@ -49,11 +78,18 @@ jobs:
           GENE_AI_USERNAME=${{ secrets.GENE_AI_USERNAME }}
           GENE_AI_PASSWORD=${{ secrets.GENE_AI_PASSWORD }}
           EOF
+          # Append tag expression only if provided via workflow_dispatch
+          if [ -n "${{ github.event.inputs.tags }}" ]; then echo "TAGS=${{ github.event.inputs.tags }}" >> env/.env; fi
+          echo '--- env/.env (sanitized) ---'
+          sed -E 's/(GENE_AI_PASSWORD|GENE_AI_USERNAME)=.*/\1=***MASKED***/' env/.env
 
       - name: Run Cucumber tests (with Allure generation)
         run: npm run test:ci
         env:
           NODE_ENV: test
+          # Optionally treat broken as failed and archive
+          ALLURE_TREAT_BROKEN_AS_FAILED: '1'
+          ALLURE_ARCHIVE: '0'
 
       - name: Upload cucumber json report
         if: always()
